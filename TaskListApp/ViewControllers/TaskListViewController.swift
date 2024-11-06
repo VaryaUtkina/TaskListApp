@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol NewTaskViewControllerDelegate: AnyObject {
+    func reloadData()
+}
+
 final class TaskListViewController: UITableViewController {
     private var taskList: [ToDoTask] = []
     private let cellID = "task"
@@ -21,6 +25,7 @@ final class TaskListViewController: UITableViewController {
     
     @objc private func addNewTask() {
         let newTaskVC = NewTaskViewController()
+        newTaskVC.delegate = self
         present(newTaskVC, animated: true)
     }
     
@@ -78,5 +83,12 @@ private extension TaskListViewController {
             action: #selector(addNewTask)
         )
         navigationController?.navigationBar.tintColor = .white
+    }
+}
+
+extension TaskListViewController: NewTaskViewControllerDelegate {
+    func reloadData() {
+        fetchData()
+        tableView.reloadData()
     }
 }
