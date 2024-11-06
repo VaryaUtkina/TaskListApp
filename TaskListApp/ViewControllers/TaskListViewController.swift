@@ -16,7 +16,8 @@ final class TaskListViewController: UITableViewController {
     }
     
     @objc private func addNewTask() {
-        
+        let newTaskVC = NewTaskViewController()
+        present(newTaskVC, animated: true)
     }
 
 }
@@ -31,12 +32,7 @@ private extension TaskListViewController {
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
         
-        navBarAppearance.backgroundColor = UIColor(
-            red: 21/255,
-            green: 101/255,
-            blue: 192/255,
-            alpha: 194/255
-        )
+        navBarAppearance.backgroundColor = .milkBlue
         
         navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
         navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
