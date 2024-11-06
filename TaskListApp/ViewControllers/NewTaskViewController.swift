@@ -49,6 +49,11 @@ final class NewTaskViewController: UIViewController {
     }
     
     private func save() {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let task = ToDoTask(context: appDelegate.persistentContainer.viewContext)
+        task.title = taskTextField.text
+        appDelegate.saveContext()
+        
         dismiss(animated: true)
     }
 }
@@ -82,6 +87,6 @@ private extension NewTaskViewController {
     }
 }
 
-#Preview {
-    NewTaskViewController()
-}
+//#Preview {
+//    NewTaskViewController()
+//}
