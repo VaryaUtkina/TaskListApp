@@ -18,37 +18,27 @@ final class NewTaskViewController: UIViewController {
     }()
     
     private lazy var saveButton: UIButton = {
-        // Set attribute for button title
-        var attributes = AttributeContainer()
-        attributes.font = UIFont.boldSystemFont(ofSize: 18)
+        let filledButtonFactory = FilledButtonFactory(
+            title: "Save Task",
+            color: .milkBlue,
+            action: UIAction { [unowned self] _ in
+                save()
+            }
+        )
         
-        // Create button
-        var buttonConfig = UIButton.Configuration.filled()
-        buttonConfig.baseBackgroundColor = .milkBlue
-        buttonConfig.attributedTitle = AttributedString("Save Task", attributes: attributes)
-        
-        let button = UIButton(configuration: buttonConfig, primaryAction: UIAction { [unowned self] _ in
-            save()
-        })
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+        return filledButtonFactory.createButton()
     }()
     
     private lazy var cancelButton: UIButton = {
-        // Set attribute for button title
-        var attributes = AttributeContainer()
-        attributes.font = UIFont.boldSystemFont(ofSize: 18)
+        let filledButtonFactory = FilledButtonFactory(
+            title: "Cancel",
+            color: .milkRed,
+            action: UIAction { [unowned self] _ in
+                dismiss(animated: true)
+            }
+        )
         
-        // Create button
-        var buttonConfig = UIButton.Configuration.filled()
-        buttonConfig.baseBackgroundColor = .milkRed
-        buttonConfig.attributedTitle = AttributedString("Cancel", attributes: attributes)
-        
-        let button = UIButton(configuration: buttonConfig, primaryAction: UIAction { [unowned self] _ in
-            dismiss(animated: true)
-        })
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
+        return filledButtonFactory.createButton()
     }()
     
     override func viewDidLoad() {

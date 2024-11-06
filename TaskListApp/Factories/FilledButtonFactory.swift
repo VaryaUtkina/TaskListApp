@@ -42,6 +42,19 @@ final class FilledButtonFactory: ButtonFactory {
     ///
     /// - Returns: A `UIButton` instance with the predefined attributes.
     func createButton() -> UIButton {
-        <#code#>
+        // Create an attribute container and set the font
+        var attributes = AttributeContainer()
+        attributes.font = UIFont.boldSystemFont(ofSize: 18)
+        
+        // Create a filled button configuration and set the background color and title
+        var buttonConfig = UIButton.Configuration.filled()
+        buttonConfig.baseBackgroundColor = color
+        buttonConfig.attributedTitle = AttributedString(title, attributes: attributes)
+        
+        // Create a button using the configuration and action, and disable autoresizing
+        let button = UIButton(configuration: buttonConfig, primaryAction: action)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
     }
 }
