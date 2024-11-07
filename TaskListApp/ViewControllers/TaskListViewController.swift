@@ -7,6 +7,19 @@
 
 import UIKit
 
+enum Alert {
+    case save
+    case edit
+    
+    var title: String {
+        switch self {
+        case .save: "New Task"
+        case .edit: "Edit task"
+        }
+    }
+    
+}
+
 final class TaskListViewController: UITableViewController {
     private var taskList: [ToDoTask] = []
     private let cellID = "task"
@@ -20,7 +33,12 @@ final class TaskListViewController: UITableViewController {
     }
     
     @objc private func addNewTask() {
-        showAlert(withTitle: "New Task", andMessage: "What do you want to do?")
+        showAlert(.save) { textField in
+            textField.placeholder = "New task"
+        } closure: { [unowned self] taskName in
+            save(taskName)
+        }
+
     }
     
     private func fetchData() {
@@ -34,17 +52,21 @@ final class TaskListViewController: UITableViewController {
         }
     }
     
-    private func showAlert(withTitle title: String, andMessage message: String) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let saveAction = UIAlertAction(title: "Save Task", style: .default) { [unowned self] _ in
+    private func showAlert(_ alert: Alert, completion: @escaping(UITextField) -> Void, closure: @escaping(String) -> Void) {
+        let alert = UIAlertController(
+            title: alert.title,
+            message: "What do you want to do?",
+            preferredStyle: .alert
+        )
+        let saveAction = UIAlertAction(title: "Save Task", style: .default) { _ in
             guard let taskName = alert.textFields?.first?.text, !taskName.isEmpty else { return }
-            save(taskName)
+            closure(taskName)
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
         alert.addAction(saveAction)
         alert.addAction(cancelAction)
         alert.addTextField { textField in
-            textField.placeholder = "New Task"
+            completion(textField)
         }
         present(alert, animated: true)
     }
@@ -57,6 +79,28 @@ final class TaskListViewController: UITableViewController {
         
         let indexPath = IndexPath(row: taskList.count - 1, section: 0)
         tableView.insertRows(at: [indexPath], with: .automatic)
+        
+        appDelegate.saveContext()
+    }
+    
+    private func edit(_ taskName: String, at indexPath: IndexPath) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let task = taskList[indexPath.row]
+        task.title = taskName
+        
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+        
+        appDelegate.saveContext()
+    }
+    
+    private func delete(taskAt indexPath: IndexPath) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let task = taskList[indexPath.row]
+        
+        appDelegate.persistentContainer.viewContext.delete(task)
+        taskList.remove(at: indexPath.row)
+        
+        tableView.deleteRows(at: [indexPath], with: .automatic)
         
         appDelegate.saveContext()
     }
@@ -76,6 +120,24 @@ extension TaskListViewController {
         content.text = toDoTask.title
         cell.contentConfiguration = content
         return cell
+    }
+}
+
+// MARK: - UITableViewDelegate
+extension TaskListViewController {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        showAlert(.edit) { [unowned self] textField in
+            textField.text = taskList[indexPath.row].title
+        } closure: { [unowned self] taskName in
+            edit(taskName, at: indexPath)
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            delete(taskAt: indexPath)
+        }
     }
 }
 
